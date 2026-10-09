@@ -3,10 +3,7 @@ import {
   CalendarDays,
   Clock,
   Wand2,
-  CheckCircle2,
   Circle,
-  Plus,
-  ChevronRight,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -29,12 +26,8 @@ function getWeekDays(): { label: string; date: string; isToday: boolean }[] {
   return days;
 }
 
-function dayKeyFromSession(day: string): string {
-  return day;
-}
-
 export default function StudyPlanner() {
-  const { sessions, subjects, setSessions, toggleTask } = useApp();
+  const { sessions, setSessions } = useApp();
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [availableHours, setAvailableHours] = useState(4);

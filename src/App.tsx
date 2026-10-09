@@ -45,7 +45,7 @@ function AppContent() {
           )}
           {view === 'subjects' && <Subjects />}
           {view === 'planner' && <StudyPlanner />}
-          {view === 'research' && <ResearchAgent />}
+          {view === 'research' && <ResearchAgent onNavigate={setView} />}
           {view === 'simulator' && <WhatIfSimulator />}
           {view === 'assistant' && <AIAssistant />}
           {view === 'profile' && <Profile onResetOnboarding={() => setView('dashboard')} />}

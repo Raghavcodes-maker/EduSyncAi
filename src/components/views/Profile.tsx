@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, School, GraduationCap, BookOpen, Trash2, Save, RotateCcw, CalendarClock } from 'lucide-react';
+import { School, GraduationCap, BookOpen, Trash2, Save, RotateCcw, CalendarClock } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
@@ -43,7 +43,7 @@ export default function Profile({ onResetOnboarding }: ProfileProps) {
   const [subjectPreps, setSubjectPreps] = useState<Record<string, number>>(
     Object.fromEntries(profile?.subjects.map((s) => [s.name, s.preparation]) ?? [])
   );
-  const [subjectExams, setSubjectExams] = useState<Record<string, string>>(
+  const [subjectExams] = useState<Record<string, string>>(
     Object.fromEntries(profile?.subjects.filter((s) => s.examDate).map((s) => [s.name, s.examDate!]) ?? [])
   );
 

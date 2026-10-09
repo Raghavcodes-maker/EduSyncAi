@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { BrainCircuit, ArrowRight, ArrowLeft, Check, GraduationCap, School, BookOpen, Plus, X, CalendarClock } from 'lucide-react';
+import { BrainCircuit, ArrowRight, ArrowLeft, Check, GraduationCap, School, Plus, X, CalendarClock } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useApp } from '@/context/AppContext';
 import {
   SCHOOL_SUBJECTS,
   COLLEGE_SUBJECTS,

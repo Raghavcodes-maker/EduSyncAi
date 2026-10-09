@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Activity, BookOpen, CalendarClock, TrendingUp, ChevronRight, AlertTriangle, Clock, CheckCircle2, Wand2, Target } from 'lucide-react';
 import Card from '@/components/ui/Card';
-import CircularProgress from '@/components/ui/CircularProgress';
 import ProgressBar from '@/components/ui/ProgressBar';
 import BarChart from '@/components/ui/BarChart';
 import { StatusBadge } from '@/components/ui/Badges';
@@ -75,28 +74,56 @@ export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
       {/* Hero row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Academic Health */}
-        <Card className="p-6 lg:col-span-1" delay={0}>
-          <div className="flex items-center gap-2 mb-4">
-            <Activity size={18} className="text-sky-400" />
-            <h3 className="font-display font-semibold text-white text-sm tracking-wide uppercase">
-              Academic Health
-            </h3>
-          </div>
-          <div className="flex flex-col items-center py-2">
-            <CircularProgress value={academicHealth} size="lg" color="#38bdf8" label="Health" />
-            <div className="mt-4 flex items-center gap-2">
+        <Card className="p-6 lg:col-span-1 flex flex-col justify-between" delay={0}>
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Activity size={18} className="text-sky-400" />
+                <h3 className="font-display font-semibold text-white text-sm tracking-wide uppercase">
+                  Academic Health
+                </h3>
+              </div>
               <span
-                className={`text-sm font-medium ${
-                  academicHealth >= 70 ? 'text-emerald-400' : academicHealth >= 50 ? 'text-amber-400' : 'text-red-400'
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                  academicHealth >= 70
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : academicHealth >= 50
+                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                    : 'bg-red-500/10 text-red-400 border-red-500/20'
                 }`}
               >
                 {academicHealth >= 70 ? 'Strong' : academicHealth >= 50 ? 'Moderate' : 'Needs Attention'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-2 text-center leading-relaxed">
-              Based on preparation, deadlines, and study consistency across {subjects.length} subjects
-            </p>
+
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="flex items-baseline gap-1 my-1">
+                <span className="font-display text-5xl font-extrabold text-white tracking-tight">
+                  {Math.round(academicHealth)}
+                </span>
+                <span className="text-3xl font-bold text-sky-400">%</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 font-medium">Overall Academic Score</p>
+
+              {/* Progress bar */}
+              <div className="w-full bg-slate-800 rounded-full h-2.5 mt-5 overflow-hidden border border-slate-700/60">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ${
+                    academicHealth >= 70
+                      ? 'bg-emerald-400'
+                      : academicHealth >= 50
+                      ? 'bg-amber-400'
+                      : 'bg-red-400'
+                  }`}
+                  style={{ width: `${Math.min(100, Math.max(0, academicHealth))}%` }}
+                />
+              </div>
+            </div>
           </div>
+
+          <p className="text-xs text-slate-400 mt-2 text-center leading-relaxed">
+            Based on preparation, deadlines, and study consistency across {subjects.length} subjects
+          </p>
         </Card>
 
         {/* Fix My Week CTA + Quick Stats */}

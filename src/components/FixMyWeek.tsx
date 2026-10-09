@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Wand2, X, Check, AlertTriangle, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
@@ -61,11 +61,14 @@ export default function FixMyWeek({ open, onClose }: FixMyWeekProps) {
     },
   ];
 
-  const handleOpen = () => {
-    setStep('analyzing');
-    setApplied(false);
-    setTimeout(() => setStep('result'), 1800);
-  };
+  useEffect(() => {
+    if (open) {
+      setStep('analyzing');
+      setApplied(false);
+      const timer = setTimeout(() => setStep('result'), 1800);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   return (
     <>

@@ -1,0 +1,8 @@
+{
+  "name": "EduSync AI",
+  "description": "Academic digital twin and study copilot with AI-driven study planner, syllabus research agent, and schedule optimizer.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

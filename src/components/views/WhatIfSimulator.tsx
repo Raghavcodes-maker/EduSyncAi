@@ -10,8 +10,6 @@ import {
   Gauge,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import ProgressBar from '@/components/ui/ProgressBar';
 import CircularProgress from '@/components/ui/CircularProgress';
 import { useApp } from '@/context/AppContext';
 

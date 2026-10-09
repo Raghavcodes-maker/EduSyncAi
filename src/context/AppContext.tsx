@@ -5,7 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import type { Subject, StudySession, StudyTask, ChatMessage, StudentProfile, SubjectSeed } from '@/types';
+import type { Subject, StudySession, StudyTask, ChatMessage, StudentProfile, SubjectSeed, StudyPlanItem, RevisionPlanBlock } from '@/types';
 
 const STORAGE_KEY = 'edusync_profile_v1';
 
@@ -156,6 +156,11 @@ interface AppState {
   toggleTask: (id: string) => void;
   addMessage: (m: ChatMessage) => void;
   setSessions: (s: StudySession[]) => void;
+  applyStudyPlanToPlanner: (
+    subjectId: string,
+    planItems: StudyPlanItem[],
+    revisionBlocks?: RevisionPlanBlock[],
+  ) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -253,6 +258,80 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setMessages((prev) => [...prev, m]);
   };
 
+  const applyStudyPlanToPlanner = (
+    subjectId: string,
+    planItems: StudyPlanItem[],
+    revisionBlocks?: RevisionPlanBlock[],
+  ) => {
+    const targetSubject = subjects.find((s) => s.id === subjectId);
+    if (!targetSubject) return;
+
+    const newSessions: StudySession[] = [];
+    const timeSlots = ['09:00', '11:00', '14:00', '16:00', '19:00'];
+
+    planItems.forEach((item, index) => {
+      const dayOffset = Math.floor(index / 2);
+      const slotIndex = index % 2;
+      const targetDate = addDays(today, dayOffset);
+
+      newSessions.push({
+        id: `plan-sess-${Date.now()}-${index}`,
+        subjectId: targetSubject.id,
+        subjectName: targetSubject.name,
+        topic: `${item.topic}${item.startHereResource ? ` (Start: ${item.startHereResource.siteName})` : ''}`,
+        day: dayLabel(targetDate),
+        startTime: timeSlots[(slotIndex * 2) % timeSlots.length],
+        duration: Math.min(120, Math.max(45, item.estimatedTime)),
+        priority: item.priority,
+        completed: false,
+        color: targetSubject.color,
+      });
+    });
+
+    if (revisionBlocks && revisionBlocks.length > 0) {
+      revisionBlocks.forEach((rev, revIdx) => {
+        const revDayOffset = Math.max(1, planItems.length > 0 ? Math.ceil(planItems.length / 2) + revIdx : 2 + revIdx);
+        newSessions.push({
+          id: `plan-rev-${Date.now()}-${revIdx}`,
+          subjectId: targetSubject.id,
+          subjectName: targetSubject.name,
+          topic: `[${rev.type === 'mock_exam' ? 'Mock Exam' : 'Revision'}] ${rev.title}`,
+          day: dayLabel(addDays(today, revDayOffset)),
+          startTime: '10:00',
+          duration: rev.durationMinutes || 90,
+          priority: 'High',
+          completed: false,
+          color: '#fbbf24',
+        });
+      });
+    }
+
+    setSessions((prev) => {
+      const others = prev.filter((s) => s.subjectId !== subjectId);
+      return [...newSessions, ...others];
+    });
+
+    const newTasks: StudyTask[] = planItems.slice(0, 3).map((item, idx) => ({
+      id: `plan-task-${Date.now()}-${idx}`,
+      title: `Master ${item.topic} — ${targetSubject.name}`,
+      subjectName: targetSubject.name,
+      duration: `${item.estimatedTime} min`,
+      priority: item.priority,
+      done: false,
+      color: targetSubject.color,
+    }));
+
+    setTasks((prev) => {
+      const others = prev.filter((t) => t.subjectName !== targetSubject.name);
+      return [...newTasks, ...others];
+    });
+
+    const updatedTopics = planItems.map((p) => p.topic);
+    setSubjects((prev) =>
+      prev.map((s) => (s.id === subjectId ? { ...s, pendingTopics: updatedTopics } : s))
+    );
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -271,6 +350,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleTask,
         addMessage,
         setSessions,
+        applyStudyPlanToPlanner,
       }}
     >
       {children}

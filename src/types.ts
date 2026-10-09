@@ -140,6 +140,8 @@ export const COLLEGE_PROGRAMS: CollegeProgram[] = [
 
 // --- Research Agent ---
 
+export type ResourceCategory = 'youtube' | 'website' | 'course' | 'notes' | 'paper';
+
 export interface ResearchResource {
   position: number;
   title: string;
@@ -148,14 +150,52 @@ export interface ResearchResource {
   siteName: string;
   topic: string;
   relevance: string;
+  category?: ResourceCategory;
+  isVerifiedResult?: boolean; // true if live result from API, false if direct platform search link
+  isStartHere?: boolean;
+}
+
+export interface RevisionPlanBlock {
+  id: string;
+  title: string;
+  description: string;
+  dayTarget: string;
+  durationMinutes: number;
+  type: 'revision' | 'practice' | 'mock_exam';
+  completed: boolean;
 }
 
 export interface StudyPlanItem {
   topic: string;
   priority: 'High' | 'Medium' | 'Low';
+  phase?: string;
+  dayTarget?: string;
   estimatedTime: number; // minutes
+  conceptMinutes?: number;
+  practiceMinutes?: number;
+  revisionMinutes?: number;
+  startHereResource?: ResearchResource;
   resources: ResearchResource[];
   completed: boolean;
+}
+
+export type YouTubeResourceType = 'channel' | 'playlist' | 'video';
+
+export interface YouTubeChannelDiscovery {
+  id: string;
+  channelName: string;
+  channelHandle?: string;
+  channelUrl: string;
+  focusArea: string;
+  relevantTopics: string[];
+  whyRelevant: string;
+  resourceType: YouTubeResourceType;
+  recommendedPlaylistTitle?: string;
+  recommendedPlaylistUrl?: string;
+  startLearningUrl: string;
+  startLearningLabel: string;
+  isVerified: boolean;
+  subscriberHint?: string;
 }
 
 export interface ResearchSession {
@@ -165,6 +205,42 @@ export interface ResearchSession {
   availableHoursPerDay: number;
   resources: ResearchResource[];
   studyPlan: StudyPlanItem[];
+  revisionBlocks?: RevisionPlanBlock[];
+  youtubeChannels?: YouTubeChannelDiscovery[];
   createdAt: string;
   isLive: boolean; // true = live TinyFish results, false = demo/fallback
+}
+
+export interface BookmarkedYouTubeItem {
+  id: string;
+  bookmarkedAt: string;
+  subjectName: string;
+  channelName: string;
+  channelHandle?: string;
+  channelUrl: string;
+  focusArea?: string;
+  title: string;
+  url: string;
+  resourceType: YouTubeResourceType;
+  whyRelevant?: string;
+  subscriberHint?: string;
+  relevantTopics?: string[];
+  userNotes?: string;
+}
+
+export interface ResearchHistoryItem {
+  id: string;
+  createdAt: string;
+  subjectId: string;
+  subjectName: string;
+  courseContext?: string;
+  syllabusTopics: string[];
+  examDate: string;
+  availableHours: number;
+  domainType: 'web' | 'research_paper';
+  isLive: boolean;
+  resources: ResearchResource[];
+  studyPlan: StudyPlanItem[];
+  revisionBlocks: RevisionPlanBlock[];
+  youtubeChannels?: YouTubeChannelDiscovery[];
 }

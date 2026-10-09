@@ -8,7 +8,6 @@ import {
   AlertCircle,
   User,
 } from 'lucide-react';
-import Card from '@/components/ui/Card';
 import { useApp } from '@/context/AppContext';
 import type { ChatMessage } from '@/types';
 

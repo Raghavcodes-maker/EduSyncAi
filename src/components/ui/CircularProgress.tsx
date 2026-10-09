@@ -6,9 +6,9 @@ interface StatBadgeProps {
 }
 
 const sizes = {
-  sm: { box: 'w-16 h-16', stroke: 5, text: 'text-lg' },
-  md: { box: 'w-24 h-24', stroke: 6, text: 'text-2xl' },
-  lg: { box: 'w-36 h-36', stroke: 8, text: 'text-4xl' },
+  sm: { box: 'w-16 h-16', stroke: 6, text: 'text-sm' },
+  md: { box: 'w-24 h-24', stroke: 7, text: 'text-lg' },
+  lg: { box: 'w-32 h-32', stroke: 8, text: 'text-2xl' },
 };
 
 export default function CircularProgress({
@@ -18,13 +18,14 @@ export default function CircularProgress({
   color = '#38bdf8',
 }: StatBadgeProps) {
   const s = sizes[size];
-  const radius = parseInt(s.box.split('w-')[1]) / 2 - s.stroke;
+  // SVG viewBox is 100x100, so radius must be relative to 50px center with padding for strokeWidth
+  const radius = 42;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (value / 100) * circumference;
+  const offset = circumference - (Math.min(100, Math.max(0, value)) / 100) * circumference;
 
   return (
     <div className={`relative ${s.box} flex items-center justify-center`}>
-      <svg className="absolute inset-0 -rotate-90" viewBox="0 0 100 100">
+      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
         <circle
           cx="50"
           cy="50"
@@ -51,7 +52,7 @@ export default function CircularProgress({
       </svg>
       <div className="flex flex-col items-center">
         <span className={`font-display font-bold text-white ${s.text}`}>
-          {Math.round(value)}
+          {Math.round(value)}%
         </span>
         {label && <span className="text-[10px] text-slate-400 mt-0.5">{label}</span>}
       </div>
