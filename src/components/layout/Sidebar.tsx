@@ -1,5 +1,16 @@
 import type { ViewKey } from '@/types';
-import { LayoutDashboard, BookOpen, CalendarDays, Search, SlidersHorizontal, MessageSquare, BrainCircuit, UserCircle } from 'lucide-react';
+import {
+  LayoutDashboard,
+  BookOpen,
+  CalendarDays,
+  Search,
+  SlidersHorizontal,
+  MessageSquare,
+  BrainCircuit,
+  UserCircle,
+  ListChecks,
+  Sparkles,
+} from 'lucide-react';
 import { useApp, getProfileSubtitle, getProfileInitials } from '@/context/AppContext';
 
 interface SidebarProps {
@@ -11,9 +22,11 @@ interface SidebarProps {
 
 const navItems: { key: ViewKey; label: string; icon: typeof LayoutDashboard }[] = [
   { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'subjects', label: 'Subjects', icon: BookOpen },
-  { key: 'planner', label: 'Study Planner', icon: CalendarDays },
+  { key: 'syllabus', label: 'Syllabus Tracker', icon: ListChecks },
+  { key: 'quiz', label: 'Practice Quiz', icon: Sparkles },
   { key: 'research', label: 'Research Agent', icon: Search },
+  { key: 'planner', label: 'Study Planner', icon: CalendarDays },
+  { key: 'subjects', label: 'Subjects', icon: BookOpen },
   { key: 'simulator', label: 'What-If Simulator', icon: SlidersHorizontal },
   { key: 'assistant', label: 'AI Assistant', icon: MessageSquare },
   { key: 'profile', label: 'Profile', icon: UserCircle },

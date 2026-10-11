@@ -5,9 +5,25 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import type { Subject, StudySession, StudyTask, ChatMessage, StudentProfile, SubjectSeed, StudyPlanItem, RevisionPlanBlock } from '@/types';
+import type {
+  Subject,
+  StudySession,
+  StudyTask,
+  ChatMessage,
+  StudentProfile,
+  SubjectSeed,
+  StudyPlanItem,
+  RevisionPlanBlock,
+  SyllabusSubjectTracker,
+  QuizAttemptRecord,
+  TopicProgressStatus,
+  DeepWorkSession,
+} from '@/types';
 
 const STORAGE_KEY = 'edusync_profile_v1';
+const SYLLABUS_STORAGE_KEY = 'edusync_syllabus_tracker_v1';
+const QUIZ_HISTORY_STORAGE_KEY = 'edusync_quiz_history_v1';
+const DEEP_WORK_STORAGE_KEY = 'edusync_deep_work_v1';
 
 const subjectColors = [
   '#38bdf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa',
@@ -140,12 +156,94 @@ function saveProfile(profile: StudentProfile | null) {
   }
 }
 
+function loadSyllabusTrackers(): SyllabusSubjectTracker[] {
+  try {
+    const raw = localStorage.getItem(SYLLABUS_STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as SyllabusSubjectTracker[];
+  } catch {
+    return [];
+  }
+}
+
+function saveSyllabusTrackers(trackers: SyllabusSubjectTracker[]) {
+  try {
+    localStorage.setItem(SYLLABUS_STORAGE_KEY, JSON.stringify(trackers));
+  } catch {
+    // ignore
+  }
+}
+
+function loadQuizHistory(): QuizAttemptRecord[] {
+  try {
+    const raw = localStorage.getItem(QUIZ_HISTORY_STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as QuizAttemptRecord[];
+  } catch {
+    return [];
+  }
+}
+
+function saveQuizHistory(records: QuizAttemptRecord[]) {
+  try {
+    localStorage.setItem(QUIZ_HISTORY_STORAGE_KEY, JSON.stringify(records));
+  } catch {
+    // ignore
+  }
+}
+
+function loadDeepWorkSessions(): DeepWorkSession[] {
+  try {
+    const raw = localStorage.getItem(DEEP_WORK_STORAGE_KEY);
+    if (!raw) {
+      const now = new Date();
+      return [
+        {
+          id: 'dw_seed_1',
+          completedAt: new Date(now.getTime() - 1000 * 60 * 160).toISOString(),
+          durationMinutes: 25,
+          mode: 'pomodoro',
+          subjectName: 'Engineering Mathematics',
+          topic: 'First-Order Differential Equations',
+          color: '#38bdf8',
+        },
+        {
+          id: 'dw_seed_2',
+          completedAt: new Date(now.getTime() - 1000 * 60 * 80).toISOString(),
+          durationMinutes: 25,
+          mode: 'pomodoro',
+          subjectName: 'Data Structures & Algorithms',
+          topic: 'Dynamic Programming & Memoization',
+          color: '#34d399',
+        },
+      ];
+    }
+    return JSON.parse(raw) as DeepWorkSession[];
+  } catch {
+    return [];
+  }
+}
+
+function saveDeepWorkSessions(sessions: DeepWorkSession[]) {
+  try {
+    localStorage.setItem(DEEP_WORK_STORAGE_KEY, JSON.stringify(sessions));
+  } catch {
+    // ignore
+  }
+}
+
 interface AppState {
   profile: StudentProfile | null;
   subjects: Subject[];
   sessions: StudySession[];
   tasks: StudyTask[];
   messages: ChatMessage[];
+  syllabusTrackers: SyllabusSubjectTracker[];
+  quizHistory: QuizAttemptRecord[];
+  activeQuizTopic: { subjectName: string; topicTitle: string; difficulty?: 'Easy' | 'Medium' | 'Hard' } | null;
+  activeResearchTarget: { subjectName: string; topicTitle: string } | null;
+  setActiveQuizTopic: (target: { subjectName: string; topicTitle: string; difficulty?: 'Easy' | 'Medium' | 'Hard' } | null) => void;
+  setActiveResearchTarget: (target: { subjectName: string; topicTitle: string } | null) => void;
   completeOnboarding: (profile: StudentProfile) => void;
   updateProfile: (profile: StudentProfile) => void;
   resetProfile: () => void;
@@ -161,6 +259,22 @@ interface AppState {
     planItems: StudyPlanItem[],
     revisionBlocks?: RevisionPlanBlock[],
   ) => void;
+  // Syllabus Tracker methods
+  addSyllabusSubject: (subjectName: string, initialTopics?: string[]) => void;
+  addSyllabusTopics: (subjectId: string, newTopics: string[]) => void;
+  updateTopicStatus: (subjectId: string, topicId: string, status: TopicProgressStatus) => void;
+  deleteSyllabusTopic: (subjectId: string, topicId: string) => void;
+  deleteSyllabusSubject: (subjectId: string) => void;
+  recordTopicQuizResult: (subjectName: string, topicTitle: string, scorePct: number) => void;
+  // Quiz History methods
+  addQuizAttempt: (record: QuizAttemptRecord) => void;
+  clearQuizHistory: () => void;
+  // Deep Work / Focus Timer methods
+  deepWorkSessions: DeepWorkSession[];
+  activeFocusTask: { subjectName?: string; topic?: string } | null;
+  setActiveFocusTask: (task: { subjectName?: string; topic?: string } | null) => void;
+  logDeepWorkSession: (session: Omit<DeepWorkSession, 'id' | 'completedAt'>) => DeepWorkSession;
+  clearDeepWorkHistory: () => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -177,6 +291,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [tasks, setTasks] = useState<StudyTask[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [syllabusTrackers, setSyllabusTrackers] = useState<SyllabusSubjectTracker[]>(() => loadSyllabusTrackers());
+  const [quizHistory, setQuizHistory] = useState<QuizAttemptRecord[]>(() => loadQuizHistory());
+  const [deepWorkSessions, setDeepWorkSessions] = useState<DeepWorkSession[]>(() => loadDeepWorkSessions());
+  const [activeQuizTopic, setActiveQuizTopic] = useState<{ subjectName: string; topicTitle: string; difficulty?: 'Easy' | 'Medium' | 'Hard' } | null>(null);
+  const [activeResearchTarget, setActiveResearchTarget] = useState<{ subjectName: string; topicTitle: string } | null>(null);
+  const [activeFocusTask, setActiveFocusTask] = useState<{ subjectName?: string; topic?: string } | null>(null);
+
+  // Sync / seed initial syllabus trackers from onboarded subjects if empty
+  useEffect(() => {
+    if (syllabusTrackers.length === 0 && subjects.length > 0) {
+      const initialTrackers: SyllabusSubjectTracker[] = subjects.map((subj) => ({
+        id: `syl_${subj.id}`,
+        subjectName: subj.name,
+        subjectCode: subj.code,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        topics: (subj.pendingTopics.length > 0
+          ? subj.pendingTopics
+          : ['Core Principles', 'Problem Solving Methods', 'Theory & Derivations', 'Previous Year Questions']
+        ).map((t, idx) => ({
+          id: `top_${subj.id}_${idx}_${Date.now()}`,
+          title: t,
+          status: idx === 0 ? 'in_progress' : 'not_started',
+          updatedAt: new Date().toISOString(),
+        })),
+      }));
+      setSyllabusTrackers(initialTrackers);
+      saveSyllabusTrackers(initialTrackers);
+    }
+  }, [subjects, syllabusTrackers.length]);
 
   // Load profile from localStorage on mount
   useEffect(() => {
@@ -332,6 +476,163 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  // --- Syllabus Tracker Implementations ---
+
+  const addSyllabusSubject = (subjectName: string, initialTopics: string[] = []) => {
+    const cleanName = subjectName.trim();
+    if (!cleanName) return;
+
+    setSyllabusTrackers((prev) => {
+      const existing = prev.find((s) => s.subjectName.toLowerCase() === cleanName.toLowerCase());
+      if (existing) return prev;
+
+      const newSubject: SyllabusSubjectTracker = {
+        id: `syl_${Date.now()}`,
+        subjectName: cleanName,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        topics: initialTopics.map((t, idx) => ({
+          id: `top_${Date.now()}_${idx}`,
+          title: t.trim(),
+          status: 'not_started',
+          updatedAt: new Date().toISOString(),
+        })),
+      };
+      const updated = [...prev, newSubject];
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  const addSyllabusTopics = (subjectId: string, newTopics: string[]) => {
+    if (newTopics.length === 0) return;
+    setSyllabusTrackers((prev) => {
+      const updated = prev.map((subj) => {
+        if (subj.id !== subjectId) return subj;
+        const existingTitles = new Set(subj.topics.map((t) => t.title.toLowerCase()));
+        const uniqueToAdd = newTopics
+          .map((t) => t.trim())
+          .filter((t) => t.length > 0 && !existingTitles.has(t.toLowerCase()))
+          .map((t, i) => ({
+            id: `top_${Date.now()}_${i}`,
+            title: t,
+            status: 'not_started' as TopicProgressStatus,
+            updatedAt: new Date().toISOString(),
+          }));
+        return {
+          ...subj,
+          topics: [...subj.topics, ...uniqueToAdd],
+          updatedAt: new Date().toISOString(),
+        };
+      });
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  const updateTopicStatus = (subjectId: string, topicId: string, status: TopicProgressStatus) => {
+    setSyllabusTrackers((prev) => {
+      const updated = prev.map((subj) => {
+        if (subj.id !== subjectId) return subj;
+        const nextTopics = subj.topics.map((t) =>
+          t.id === topicId ? { ...t, status, updatedAt: new Date().toISOString() } : t
+        );
+        return {
+          ...subj,
+          topics: nextTopics,
+          updatedAt: new Date().toISOString(),
+        };
+      });
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  const deleteSyllabusTopic = (subjectId: string, topicId: string) => {
+    setSyllabusTrackers((prev) => {
+      const updated = prev.map((subj) => {
+        if (subj.id !== subjectId) return subj;
+        return {
+          ...subj,
+          topics: subj.topics.filter((t) => t.id !== topicId),
+          updatedAt: new Date().toISOString(),
+        };
+      });
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  const deleteSyllabusSubject = (subjectId: string) => {
+    setSyllabusTrackers((prev) => {
+      const updated = prev.filter((s) => s.id !== subjectId);
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  const recordTopicQuizResult = (subjectName: string, topicTitle: string, scorePct: number) => {
+    setSyllabusTrackers((prev) => {
+      const updated = prev.map((subj) => {
+        if (subj.subjectName.toLowerCase() !== subjectName.toLowerCase()) return subj;
+        const nextTopics = subj.topics.map((t) => {
+          if (t.title.toLowerCase() !== topicTitle.toLowerCase()) return t;
+          // Auto-mark completed if score >= 80%, or in_progress if attempted
+          const newStatus: TopicProgressStatus =
+            scorePct >= 80 ? 'completed' : t.status === 'completed' ? 'completed' : 'in_progress';
+          return {
+            ...t,
+            status: newStatus,
+            lastScorePct: scorePct,
+            lastQuizDate: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+        });
+        return { ...subj, topics: nextTopics, updatedAt: new Date().toISOString() };
+      });
+      saveSyllabusTrackers(updated);
+      return updated;
+    });
+  };
+
+  // --- Quiz History Implementations ---
+
+  const addQuizAttempt = (record: QuizAttemptRecord) => {
+    setQuizHistory((prev) => {
+      const updated = [record, ...prev];
+      saveQuizHistory(updated);
+      return updated;
+    });
+    // Also link back to tracker
+    recordTopicQuizResult(record.subjectName, record.topicTitle, record.scorePct);
+  };
+
+  const clearQuizHistory = () => {
+    setQuizHistory([]);
+    saveQuizHistory([]);
+  };
+
+  // --- Deep Work Focus Timer Implementations ---
+
+  const logDeepWorkSession = (session: Omit<DeepWorkSession, 'id' | 'completedAt'>): DeepWorkSession => {
+    const newSession: DeepWorkSession = {
+      ...session,
+      id: `dw_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      completedAt: new Date().toISOString(),
+    };
+    setDeepWorkSessions((prev) => {
+      const updated = [newSession, ...prev];
+      saveDeepWorkSessions(updated);
+      return updated;
+    });
+    return newSession;
+  };
+
+  const clearDeepWorkHistory = () => {
+    setDeepWorkSessions([]);
+    saveDeepWorkSessions([]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -340,6 +641,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         sessions,
         tasks,
         messages,
+        syllabusTrackers,
+        quizHistory,
+        activeQuizTopic,
+        activeResearchTarget,
+        setActiveQuizTopic,
+        setActiveResearchTarget,
         completeOnboarding,
         updateProfile,
         resetProfile,
@@ -351,6 +658,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addMessage,
         setSessions,
         applyStudyPlanToPlanner,
+        addSyllabusSubject,
+        addSyllabusTopics,
+        updateTopicStatus,
+        deleteSyllabusTopic,
+        deleteSyllabusSubject,
+        recordTopicQuizResult,
+        addQuizAttempt,
+        clearQuizHistory,
+        deepWorkSessions,
+        activeFocusTask,
+        setActiveFocusTask,
+        logDeepWorkSession,
+        clearDeepWorkHistory,
       }}
     >
       {children}

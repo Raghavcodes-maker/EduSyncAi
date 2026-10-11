@@ -5,6 +5,7 @@ interface ProgressBarProps {
   height?: string;
   showLabel?: boolean;
   animated?: boolean;
+  className?: string;
 }
 
 export default function ProgressBar({
@@ -14,10 +15,11 @@ export default function ProgressBar({
   height = 'h-2',
   showLabel = false,
   animated = true,
+  className = '',
 }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, (value / max) * 100));
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       <div className={`w-full ${height} bg-white/8 rounded-full overflow-hidden`}>
         <div
           className={`h-full rounded-full ${animated ? 'transition-all duration-700 ease-out' : ''}`}

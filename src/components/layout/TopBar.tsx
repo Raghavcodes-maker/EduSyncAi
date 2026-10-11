@@ -10,6 +10,8 @@ interface TopBarProps {
 
 const titles: Record<ViewKey, { title: string; subtitle: string }> = {
   dashboard: { title: 'Dashboard', subtitle: 'Your academic command center' },
+  syllabus: { title: 'Smart Syllabus Tracker', subtitle: 'Track syllabus topics, mastery status, and progress percentages' },
+  quiz: { title: 'Topic-Based Practice Quiz', subtitle: 'Original multiple-choice exam questions with detailed explanations' },
   subjects: { title: 'Subjects', subtitle: 'Manage your courses and track preparation' },
   planner: { title: 'Study Planner', subtitle: 'Your adaptive study schedule' },
   research: { title: 'Research Agent', subtitle: 'Evidence-based study resource discovery' },

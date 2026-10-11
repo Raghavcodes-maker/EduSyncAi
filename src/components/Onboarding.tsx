@@ -411,6 +411,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         <p className="text-center text-[11px] text-slate-500 mt-4">
           Step {step + 1} of {totalSteps} · {stepTitles[step]}
         </p>
+
+        {/* Founder Credit */}
+        <div className="pt-6 mt-6 border-t border-white/6 text-center">
+          <p className="text-xs text-slate-400 font-medium tracking-wide">
+            Created &amp; Founded by{' '}
+            <span className="text-slate-200 font-semibold">Raghav Sharma</span>
+          </p>
+        </div>
       </div>
     </div>
   );

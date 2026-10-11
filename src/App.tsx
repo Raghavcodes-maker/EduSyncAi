@@ -7,6 +7,8 @@ import Dashboard from '@/components/views/Dashboard';
 import Subjects from '@/components/views/Subjects';
 import StudyPlanner from '@/components/views/StudyPlanner';
 import ResearchAgent from '@/components/views/ResearchAgent';
+import SyllabusTrackerView from '@/components/views/SyllabusTrackerView';
+import PracticeQuizView from '@/components/views/PracticeQuizView';
 import WhatIfSimulator from '@/components/views/WhatIfSimulator';
 import AIAssistant from '@/components/views/AIAssistant';
 import Profile from '@/components/views/Profile';
@@ -19,7 +21,6 @@ function AppContent() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [fixOpen, setFixOpen] = useState(false);
 
-  // Show onboarding if no profile or not onboarded
   // Show onboarding if no profile or not onboarded
   if (!profile || !profile.onboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
@@ -43,6 +44,8 @@ function AppContent() {
           {view === 'dashboard' && (
             <Dashboard onNavigate={setView} onFixMyWeek={() => setFixOpen(true)} />
           )}
+          {view === 'syllabus' && <SyllabusTrackerView onNavigate={setView} />}
+          {view === 'quiz' && <PracticeQuizView onNavigate={setView} />}
           {view === 'subjects' && <Subjects />}
           {view === 'planner' && <StudyPlanner />}
           {view === 'research' && <ResearchAgent onNavigate={setView} />}

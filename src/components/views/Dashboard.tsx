@@ -1,5 +1,16 @@
 import { useState } from 'react';
-import { Activity, BookOpen, CalendarClock, TrendingUp, ChevronRight, AlertTriangle, Clock, CheckCircle2, Wand2, Target } from 'lucide-react';
+import {
+  Activity,
+  BookOpen,
+  CalendarClock,
+  TrendingUp,
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle2,
+  Wand2,
+  Target,
+  Flame,
+} from 'lucide-react';
 import Card from '@/components/ui/Card';
 import ProgressBar from '@/components/ui/ProgressBar';
 import BarChart from '@/components/ui/BarChart';
@@ -7,6 +18,7 @@ import { StatusBadge } from '@/components/ui/Badges';
 import { useApp, getProfileSubtitle } from '@/context/AppContext';
 import { weeklyStudyData } from '@/demoData';
 import type { ViewKey, ExamItem } from '@/types';
+import PomodoroFocusTimer from '@/components/PomodoroFocusTimer';
 
 interface DashboardProps {
   onNavigate: (v: ViewKey) => void;
@@ -14,8 +26,13 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
-  const { profile, subjects, tasks, toggleTask } = useApp();
+  const { profile, subjects, tasks, toggleTask, deepWorkSessions, setActiveFocusTask } = useApp();
   const [fixHover, setFixHover] = useState(false);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayDeepWorkMinutes = deepWorkSessions
+    .filter((s) => s.completedAt.startsWith(todayStr))
+    .reduce((sum, s) => sum + s.durationMinutes, 0);
 
   const avgPrep = subjects.length > 0
     ? Math.round(subjects.reduce((sum, s) => sum + s.preparation, 0) / subjects.length)
@@ -171,23 +188,38 @@ export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
             </div>
           </button>
 
-          <div className="grid grid-cols-3 gap-3 mt-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5">
+            <button
+              onClick={() => onNavigate('syllabus')}
+              className="card-surface hover:bg-sky-500/10 hover:border-sky-500/30 border border-white/6 rounded-xl p-3 text-center transition-all cursor-pointer group"
+            >
+              <p className="font-display text-sm font-semibold text-white group-hover:text-sky-300">Syllabus</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Track &amp; Progress</p>
+            </button>
+            <button
+              onClick={() => onNavigate('quiz')}
+              className="card-surface hover:bg-purple-500/10 hover:border-purple-500/30 border border-white/6 rounded-xl p-3 text-center transition-all cursor-pointer group"
+            >
+              <p className="font-display text-sm font-semibold text-white group-hover:text-purple-300">Practice Quiz</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">AI Questions</p>
+            </button>
+            <button
+              onClick={() => {
+                document.getElementById('pomodoro-timer-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="card-surface hover:bg-amber-500/10 hover:border-amber-500/30 border border-white/6 rounded-xl p-3 text-center transition-all cursor-pointer group"
+            >
+              <p className="font-display text-sm font-semibold text-white group-hover:text-amber-300 flex items-center justify-center gap-1">
+                <Flame size={14} className="text-amber-400" />
+                {todayDeepWorkMinutes}m
+              </p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Deep Work Today</p>
+            </button>
             <div className="card-surface rounded-xl p-3 text-center">
-              <BookOpen size={16} className="mx-auto text-slate-400 mb-1" />
-              <p className="font-display text-xl font-bold text-white">{subjects.length}</p>
-              <p className="text-[11px] text-slate-400">Subjects</p>
-            </div>
-            <div className="card-surface rounded-xl p-3 text-center">
-              <Clock size={16} className="mx-auto text-slate-400 mb-1" />
-              <p className="font-display text-xl font-bold text-white">{totalStudyHours}h</p>
-              <p className="text-[11px] text-slate-400">This Week</p>
-            </div>
-            <div className="card-surface rounded-xl p-3 text-center">
-              <CheckCircle2 size={16} className="mx-auto text-slate-400 mb-1" />
-              <p className="font-display text-xl font-bold text-white">
+              <p className="font-display text-sm font-bold text-white">
                 {tasksDone}/{tasks.length}
               </p>
-              <p className="text-[11px] text-slate-400">Today's Tasks</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Tasks Done</p>
             </div>
           </div>
         </Card>
@@ -251,6 +283,11 @@ export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
         </div>
       </div>
 
+      {/* Pomodoro Focus & Deep Work Timer */}
+      <div id="pomodoro-timer-section">
+        <PomodoroFocusTimer onNavigateToSubjects={() => onNavigate('subjects')} />
+      </div>
+
       {/* Today's Tasks + Weekly Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Today's Tasks */}
@@ -298,6 +335,24 @@ export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
                     <span className="text-[11px] text-slate-500">· {task.duration}</span>
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveFocusTask({
+                      subjectName: task.subjectName,
+                      topic: task.title,
+                    });
+                    document.getElementById('pomodoro-timer-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="px-2 py-1 rounded-lg text-[10px] font-semibold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                  title="Focus on this task in the Pomodoro Timer"
+                >
+                  <Flame size={11} className="text-amber-400" />
+                  <span>Focus</span>
+                </button>
+
                 <span
                   className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${
                     task.priority === 'High'
@@ -421,6 +476,19 @@ export default function Dashboard({ onNavigate, onFixMyWeek }: DashboardProps) {
           </button>
         </Card>
       </div>
+
+      {/* Founder Credit */}
+      <footer className="pt-10 pb-6 mt-12 border-t border-white/6 text-center">
+        <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide">
+          Created &amp; Founded by{' '}
+          <span className="text-slate-200 font-semibold hover:text-sky-400 transition-colors">
+            Raghav Sharma
+          </span>
+        </p>
+        <p className="text-[11px] text-slate-500 mt-1.5 tracking-normal">
+          EduSync AI &bull; Intelligent Academic Workspace
+        </p>
+      </footer>
     </div>
   );
 }

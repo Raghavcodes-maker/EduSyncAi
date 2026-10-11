@@ -195,53 +195,16 @@ export async function searchTopic(
 }> {
   const query = `${subjectName} ${topic} syllabus lecture notes tutorial`;
 
-  // 1. Try local dev-server /api/tinyfish-search proxy first (secure, server-side)
-  try {
-    const proxyResponse = await fetch('/api/tinyfish-search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        domain_type: domainType ?? 'web',
-        purpose: `Find educational resources for ${courseContext ? courseContext + ' student' : 'student'} studying ${topic} in ${subjectName}`,
-      }),
-    });
-
-    if (proxyResponse.ok) {
-      const data: TinyFishResponse = await proxyResponse.json();
-
-      if (data.configured && Array.isArray(data.results) && data.results.length > 0) {
-        // Real verified results from TinyFish
-        const liveResources: ResearchResource[] = data.results.slice(0, 5).map((r, index) => {
-          const cat = categorizeUrl(r.url, r.site_name);
-          return {
-            position: r.position || index + 1,
-            title: r.title,
-            url: r.url,
-            snippet: r.snippet,
-            siteName: r.site_name,
-            topic,
-            category: cat,
-            isVerifiedResult: true,
-            isStartHere: index === 0,
-            relevance: `Verified result retrieved via TinyFish — covers "${topic}" for ${subjectName}`,
-          };
-        });
-
-        return { resources: liveResources, isLive: true };
-      }
-    }
-  } catch {
-    // Fall through to try Supabase if configured
-  }
-
-  // 2. Try Supabase Edge Function if VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are present
+  // 1. Prefer Supabase Edge Function if VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are present and configured
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  if (supabaseUrl && supabaseKey) {
+  if (
+    supabaseUrl &&
+    supabaseKey &&
+    supabaseUrl !== 'your_supabase_project_url' &&
+    supabaseKey !== 'your_supabase_anon_key'
+  ) {
     try {
       const edgeUrl = `${supabaseUrl}/functions/v1/tinyfish-search`;
       const response = await fetch(edgeUrl, {
@@ -272,7 +235,7 @@ export async function searchTopic(
               category: cat,
               isVerifiedResult: true,
               isStartHere: index === 0,
-              relevance: `Verified result retrieved via TinyFish — covers "${topic}" for ${subjectName}`,
+              relevance: `Verified live result retrieved via TinyFish Supabase Edge Function — covers "${topic}" for ${subjectName}`,
             };
           });
 
@@ -280,17 +243,59 @@ export async function searchTopic(
         }
       }
     } catch {
-      // Fall through to platform search links
+      // Fall through to server proxy
     }
   }
 
+  // 2. Try server-side /api/tinyfish-search proxy
+  try {
+    const proxyResponse = await fetch('/api/tinyfish-search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        domain_type: domainType ?? 'web',
+        purpose: `Find educational resources for ${courseContext ? courseContext + ' student' : 'student'} studying ${topic} in ${subjectName}`,
+      }),
+    });
+
+    if (proxyResponse.ok) {
+      const data: TinyFishResponse = await proxyResponse.json();
+
+      if (data.configured && Array.isArray(data.results) && data.results.length > 0) {
+        // Real verified results from TinyFish
+        const liveResources: ResearchResource[] = data.results.slice(0, 5).map((r, index) => {
+          const cat = categorizeUrl(r.url, r.site_name);
+          return {
+            position: r.position || index + 1,
+            title: r.title,
+            url: r.url,
+            snippet: r.snippet,
+            siteName: r.site_name,
+            topic,
+            category: cat,
+            isVerifiedResult: true,
+            isStartHere: index === 0,
+            relevance: `Verified live result retrieved via TinyFish — covers "${topic}" for ${subjectName}`,
+          };
+        });
+
+        return { resources: liveResources, isLive: true };
+      }
+    }
+  } catch {
+    // Fall through to authentic platform search links
+  }
+
   // 3. Honest, reliable platform search portals
-  // Explain why live search is inactive (key not configured) and provide authentic links
+  // Explain why live search is inactive and provide verified links
   return {
     resources: getPlatformSearchLinks(topic, subjectName, domainType, courseContext),
     isLive: false,
     unconfiguredReason:
-      'TINYFISH_API_KEY is not configured in the environment. Direct, verified syllabus search links have been generated across academic repositories.',
+      'TINYFISH_API_KEY is not configured in the environment. Direct, verified syllabus search links have been generated across academic repositories (YouTube, MIT OCW, Khan Academy, GeeksforGeeks, OpenStax).',
   };
 }
 

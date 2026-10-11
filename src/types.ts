@@ -1,5 +1,7 @@
 export type ViewKey =
   | 'dashboard'
+  | 'syllabus'
+  | 'quiz'
   | 'subjects'
   | 'planner'
   | 'research'
@@ -244,3 +246,69 @@ export interface ResearchHistoryItem {
   revisionBlocks: RevisionPlanBlock[];
   youtubeChannels?: YouTubeChannelDiscovery[];
 }
+
+// --- Smart Syllabus Tracker ---
+
+export type TopicProgressStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface SyllabusTopicItem {
+  id: string;
+  title: string;
+  status: TopicProgressStatus;
+  updatedAt: string;
+  lastScorePct?: number;
+  lastQuizDate?: string;
+  notes?: string;
+}
+
+export interface SyllabusSubjectTracker {
+  id: string;
+  subjectName: string;
+  subjectCode?: string;
+  topics: SyllabusTopicItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// --- Topic-Based Practice Quiz ---
+
+export type QuizDifficulty = 'Easy' | 'Medium' | 'Hard';
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: [string, string, string, string]; // exactly 4 plausible choices
+  correctAnswerIndex: number; // 0, 1, 2, or 3
+  explanation: string;
+  topicTag: string;
+  difficulty: QuizDifficulty;
+}
+
+export interface QuizAttemptRecord {
+  id: string;
+  date: string;
+  subjectName: string;
+  topicTitle: string;
+  difficulty: QuizDifficulty;
+  totalQuestions: number;
+  score: number;
+  scorePct: number;
+  questions: QuizQuestion[];
+  userAnswers: Record<string, number>; // questionId -> selectedOptionIndex
+}
+
+// --- Deep Work / Pomodoro Focus Timer ---
+
+export type FocusMode = 'pomodoro' | 'shortBreak' | 'longBreak';
+
+export interface DeepWorkSession {
+  id: string;
+  completedAt: string;
+  durationMinutes: number;
+  mode: FocusMode;
+  subjectId?: string;
+  subjectName?: string;
+  topic?: string;
+  color?: string;
+}
+

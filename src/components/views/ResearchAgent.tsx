@@ -113,7 +113,13 @@ function formatHistoryTime(isoStr: string): string {
 }
 
 export default function ResearchAgent({ onNavigate }: ResearchAgentProps) {
-  const { subjects, profile, applyStudyPlanToPlanner } = useApp();
+  const {
+    subjects,
+    profile,
+    applyStudyPlanToPlanner,
+    activeResearchTarget,
+    setActiveQuizTopic,
+  } = useApp();
 
   const [selectedSubjectId, setSelectedSubjectId] = useState(subjects[0]?.id ?? '');
   const [courseContext, setCourseContext] = useState('');
@@ -138,6 +144,19 @@ export default function ResearchAgent({ onNavigate }: ResearchAgentProps) {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [activeResultsTab, setActiveResultsTab] = useState<ResultsTab>('plan');
   const [planSynced, setPlanSynced] = useState(false);
+
+  // Sync if activeResearchTarget is set (e.g. from Syllabus Tracker)
+  useEffect(() => {
+    if (activeResearchTarget) {
+      const matchSubject = subjects.find(
+        (s) => s.name.toLowerCase() === activeResearchTarget.subjectName.toLowerCase()
+      );
+      if (matchSubject) {
+        setSelectedSubjectId(matchSubject.id);
+      }
+      setSyllabusInput(activeResearchTarget.topicTitle);
+    }
+  }, [activeResearchTarget, subjects]);
 
   // YouTube Channel filters
   const [ytTopicFilter, setYtTopicFilter] = useState<string>('all');
@@ -1609,13 +1628,34 @@ export default function ResearchAgent({ onNavigate }: ResearchAgentProps) {
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => setExpandedTopic(isExpanded ? null : item.topic)}
-                          className="text-slate-400 hover:text-white p-1"
-                        >
-                          {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                        </button>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {onNavigate && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveQuizTopic({
+                                  subjectName: selectedSubject?.name || 'General',
+                                  topicTitle: item.topic,
+                                  difficulty: 'Medium',
+                                });
+                                onNavigate('quiz');
+                              }}
+                              className="px-2.5 py-1 rounded-lg text-xs font-semibold text-purple-300 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/25 transition-all flex items-center gap-1 cursor-pointer"
+                              title="Start Practice Quiz for this topic"
+                            >
+                              <Sparkles size={12} />
+                              <span>Quiz</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setExpandedTopic(isExpanded ? null : item.topic)}
+                            className="text-slate-400 hover:text-white p-1"
+                          >
+                            {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                          </button>
+                        </div>
                       </div>
 
                       {/* Expanded details */}
