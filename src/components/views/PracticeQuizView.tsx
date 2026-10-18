@@ -110,16 +110,46 @@ export default function PracticeQuizView({ onNavigate }: PracticeQuizViewProps) 
     setLoadingStepText(`Formulating ${difficulty} practice questions for "${selectedTopicTitle}"...`);
 
     try {
-      const response = await fetch('/api/quiz/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: selectedSubjectName,
-          topic: selectedTopicTitle,
-          difficulty,
-          count: questionCount,
-        }),
-      });
+      const quizPayload = {
+        subject: selectedSubjectName,
+        topic: selectedTopicTitle,
+        difficulty,
+        count: questionCount,
+      };
+
+      let response: Response | null = null;
+
+      // 1. Prefer Supabase Edge Function (available on the published static site)
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      if (
+        supabaseUrl &&
+        supabaseKey &&
+        supabaseUrl !== 'your_supabase_project_url' &&
+        supabaseKey !== 'your_supabase_anon_key'
+      ) {
+        try {
+          response = await fetch(`${supabaseUrl}/functions/v1/quiz-generate`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${supabaseKey}`,
+            },
+            body: JSON.stringify(quizPayload),
+          });
+        } catch {
+          response = null;
+        }
+      }
+
+      // 2. Fall back to Vite dev/preview server middleware (local dev only)
+      if (!response || !response.ok) {
+        response = await fetch('/api/quiz/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(quizPayload),
+        });
+      }
 
       const contentType = response.headers.get('content-type') || '';
 

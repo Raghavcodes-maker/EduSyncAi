@@ -1,2 +1,5 @@
 [functions.tinyfish-search]
 verify_jwt = true
+
+[functions.quiz-generate]
+verify_jwt = true
