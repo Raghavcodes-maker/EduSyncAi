@@ -985,15 +985,6 @@ export default function ResearchAgent({ onNavigate }: ResearchAgentProps) {
           {/* Subview: Research Form */}
           {activeMainMode === 'research' && (
             <Card className="p-6 space-y-6" delay={0}>
-          <div className="flex items-start gap-3 p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-200/90 leading-relaxed">
-            <Info size={18} className="text-sky-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-sky-300">Authentic Resource &amp; YouTube Channel Discovery:</span>{' '}
-              We match your exact syllabus topics to verified university channels (e.g. Gate Smashers, Abdul Bari, MIT OCW, 3Blue1Brown, NPTEL)
-              and discover authentic video playlists, notes, and textbooks with clickable “Start Learning” links. You can bookmark any channel or video to your <strong className="text-amber-300">My Library</strong>.
-            </div>
-          </div>
-
           {/* Quick-Access Recent Searches Strip if history exists */}
           {history.length > 0 && (
             <div className="p-3.5 rounded-xl bg-white/3 border border-white/8 space-y-2.5">

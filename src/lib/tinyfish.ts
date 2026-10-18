@@ -111,6 +111,54 @@ export function getPlatformSearchLinks(
       isVerifiedResult: false,
       relevance: `Fast discovery of influential papers and study-relevant methodology overviews.`,
     });
+
+    list.push({
+      position: 4,
+      title: `ResearchGate: Academic Q&A & Publications for "${topic}"`,
+      url: `https://www.researchgate.net/search/publication?q=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Search published research, preprints, and academic discussions across global universities and labs.`,
+      siteName: 'ResearchGate',
+      topic,
+      category: 'paper',
+      isVerifiedResult: false,
+      relevance: `Direct author uploads, datasets, and open-access publications with community Q&A.`,
+    });
+
+    list.push({
+      position: 5,
+      title: `PubMed: Biomedical & Life Sciences Research for "${topic}"`,
+      url: `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `NIH repository of biomedical, life sciences, and chemistry peer-reviewed publications.`,
+      siteName: 'PubMed (NIH)',
+      topic,
+      category: 'paper',
+      isVerifiedResult: false,
+      relevance: `Authoritative medical, biological, and biochemical peer-reviewed literature.`,
+    });
+
+    list.push({
+      position: 6,
+      title: `CORE: Global Open Access Research Papers for "${topic}"`,
+      url: `https://core.ac.uk/search?q=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Aggregate search across millions of open-access papers from universities and repositories worldwide.`,
+      siteName: 'CORE',
+      topic,
+      category: 'paper',
+      isVerifiedResult: false,
+      relevance: `Global open-access full-text papers, theses, and institutional repository outputs.`,
+    });
+
+    list.push({
+      position: 7,
+      title: `DOAJ: Directory of Open Access Journals for "${topic}"`,
+      url: `https://doaj.org/search?q=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Search high-quality, peer-reviewed open access journals across all academic disciplines.`,
+      siteName: 'DOAJ',
+      topic,
+      category: 'paper',
+      isVerifiedResult: false,
+      relevance: `Free, peer-reviewed journal articles across science, humanities, and social sciences.`,
+    });
   } else {
     // 1. YouTube Lectures & Playlists (Recommended Start Here for concepts)
     list.push({
@@ -176,6 +224,84 @@ export function getPlatformSearchLinks(
       category: 'website',
       isVerifiedResult: false,
       relevance: `Authoritative textbook chapters, worked examples, and end-of-chapter practice questions.`,
+    });
+
+    // 6. Coursera University Courses
+    list.push({
+      position: 6,
+      title: `Coursera: "${topic}" University Courses & Specializations`,
+      url: `https://www.coursera.org/search?query=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Search accredited online courses from Stanford, Yale, Google, IBM, and global universities.`,
+      siteName: 'Coursera',
+      topic,
+      category: 'course',
+      isVerifiedResult: false,
+      relevance: `University-grade structured courses with assignments, certificates, and peer-reviewed projects.`,
+    });
+
+    // 7. edX Harvard/MIT/ Berkeley
+    list.push({
+      position: 7,
+      title: `edX: "${topic}" Harvard, MIT & Berkeley Free Courses`,
+      url: `https://www.edx.org/search?q=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Search MOOCs from HarvardX, MITx, BerkeleyX, and global university partners.`,
+      siteName: 'edX',
+      topic,
+      category: 'course',
+      isVerifiedResult: false,
+      relevance: `Self-paced verified university courses with video lectures, problem sets, and exams.`,
+    });
+
+    // 8. NPTEL Indian Institute Courses
+    list.push({
+      position: 8,
+      title: `NPTEL: "${topic}" IIT & IISc Online Course Modules`,
+      url: `https://nptel.ac.in/search?query=${encodeURIComponent(topic)}`,
+      snippet: `Official Indian Institute of Technology and IISc course modules with assignments and certification exams.`,
+      siteName: 'NPTEL',
+      topic,
+      category: 'course',
+      isVerifiedResult: false,
+      relevance: `Degree-level Indian engineering & science courses aligned to standard university syllabi.`,
+    });
+
+    // 9. Wolfram MathWorld / Demonstrations
+    list.push({
+      position: 9,
+      title: `Wolfram MathWorld & Demonstrations: "${topic}"`,
+      url: `https://mathworld.wolfram.com/search/?query=${encodeURIComponent(topic)}`,
+      snippet: `Encyclopedic mathematics reference with interactive Wolfram Demonstrations and worked formulas.`,
+      siteName: 'Wolfram MathWorld',
+      topic,
+      category: 'website',
+      isVerifiedResult: false,
+      relevance: `Authoritative math/physics definitions, derivations, and interactive visualizations.`,
+    });
+
+    // 10. Wikipedia + Wikiversity
+    list.push({
+      position: 10,
+      title: `Wikipedia & Wikiversity: "${topic}" Encyclopedic Overview`,
+      url: `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(`${subjectName} ${topic}`)}`,
+      snippet: `Open encyclopedic overview with primary citations and linked open courseware on Wikiversity.`,
+      siteName: 'Wikipedia / Wikiversity',
+      topic,
+      category: 'website',
+      isVerifiedResult: false,
+      relevance: `Foundational definitions, history, and citation graph for broader context.`,
+    });
+
+    // 11. CrashCourse / TED-Ed style educational search on YouTube education
+    list.push({
+      position: 11,
+      title: `CrashCourse & TED-Ed: "${topic}" Animated Explainers`,
+      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(`CrashCourse TED-Ed ${subjectName} ${topic} explained`)}`,
+      snippet: `High-production animated explainer videos covering science, history, economics, and literature.`,
+      siteName: 'CrashCourse / TED-Ed',
+      topic,
+      category: 'youtube',
+      isVerifiedResult: false,
+      relevance: `Engaging visual overviews ideal for first-pass learning and exam revision.`,
     });
   }
 
@@ -306,7 +432,7 @@ interface VerifiedChannelTemplate {
   focusArea: string;
   defaultWhyRelevant: string;
   subscriberHint: string;
-  category: 'cs' | 'math' | 'physics' | 'general' | 'electronics';
+  category: 'cs' | 'math' | 'physics' | 'general' | 'electronics' | 'chemistry' | 'biology' | 'economics' | 'business' | 'humanities' | 'english';
 }
 
 const VERIFIED_CHANNELS: VerifiedChannelTemplate[] = [
@@ -365,6 +491,24 @@ const VERIFIED_CHANNELS: VerifiedChannelTemplate[] = [
     subscriberHint: 'Problem Solving & Patterns',
     category: 'cs',
   },
+  {
+    channelName: 'CS50',
+    channelHandle: '@cs50',
+    channelUrl: 'https://www.youtube.com/@cs50',
+    focusArea: 'Harvard Introductory Computer Science & Programming',
+    defaultWhyRelevant: 'Harvard University flagship introductory CS course with polished lectures, problem sets, and programming abstractions.',
+    subscriberHint: 'Harvard University CS',
+    category: 'cs',
+  },
+  {
+    channelName: 'thenewboston',
+    channelHandle: '@thenewboston',
+    channelUrl: 'https://www.youtube.com/@thenewboston',
+    focusArea: 'Programming Tutorials across Languages & Frameworks',
+    defaultWhyRelevant: 'Beginner-friendly code walkthroughs across Python, C++, Java, JavaScript, and web development.',
+    subscriberHint: 'Multi-Language Tutorials',
+    category: 'cs',
+  },
 
   // Mathematics & Engineering Math
   {
@@ -392,6 +536,24 @@ const VERIFIED_CHANNELS: VerifiedChannelTemplate[] = [
     focusArea: 'Engineering Mathematics (M1, M2, M3), Discrete Math & Statistics',
     defaultWhyRelevant: 'Targeted directly at B.Tech/B.Sc semester examination curricula with exam-tested question patterns and time-saving shortcuts.',
     subscriberHint: 'University Exam Preparation',
+    category: 'math',
+  },
+  {
+    channelName: 'patrickJMT',
+    channelHandle: '@patrickjmt',
+    channelUrl: 'https://www.youtube.com/@patrickjmt',
+    focusArea: 'Calculus, Algebra & Trigonometry Worked Problems',
+    defaultWhyRelevant: 'Massive library of concise worked math problems ideal for exam practice and step-by-step derivations.',
+    subscriberHint: 'Worked Math Problems',
+    category: 'math',
+  },
+  {
+    channelName: 'Eddie Woo',
+    channelHandle: '@misterwootube',
+    channelUrl: 'https://www.youtube.com/@misterwootube',
+    focusArea: 'High School & Intro College Mathematics',
+    defaultWhyRelevant: 'Classroom-recorded math lessons covering algebra, calculus, geometry, and statistics with clear explanations.',
+    subscriberHint: 'Classroom Math Lessons',
     category: 'math',
   },
 
@@ -423,6 +585,225 @@ const VERIFIED_CHANNELS: VerifiedChannelTemplate[] = [
     subscriberHint: 'MIT Core Physics',
     category: 'physics',
   },
+  {
+    channelName: 'Physics Galaxy',
+    channelHandle: '@physicsgalaxy74',
+    channelUrl: 'https://www.youtube.com/@physicsgalaxy74',
+    focusArea: 'JEE/NEET & University Physics Concepts',
+    defaultWhyRelevant: 'Conceptual physics lectures covering mechanics, electromagnetism, optics, and modern physics for competitive exams.',
+    subscriberHint: 'Competitive Exam Physics',
+    category: 'physics',
+  },
+  {
+    channelName: 'Khan Academy Physics',
+    channelHandle: '@khanacademy',
+    channelUrl: 'https://www.youtube.com/@khanacademy',
+    focusArea: 'Foundational Physics Concepts & Problem Solving',
+    defaultWhyRelevant: 'Bite-sized physics lessons building strong intuition for kinematics, forces, energy, and circuits.',
+    subscriberHint: 'Foundational Physics',
+    category: 'physics',
+  },
+
+  // Chemistry
+  {
+    channelName: 'Professor Dave Explains',
+    channelHandle: '@ProfessorDaveExplains',
+    channelUrl: 'https://www.youtube.com/@ProfessorDaveExplains',
+    focusArea: 'Chemistry, Biology, Physics & General Science',
+    defaultWhyRelevant: 'Clear whiteboard explainers across general, organic, and physical chemistry plus biology and physics fundamentals.',
+    subscriberHint: 'Multi-Science Explainer',
+    category: 'chemistry',
+  },
+  {
+    channelName: 'Melissa Maribel',
+    channelHandle: '@melissamaribel',
+    channelUrl: 'https://www.youtube.com/@melissamaribel',
+    focusArea: 'Chemistry Step-by-Step Problem Solving',
+    defaultWhyRelevant: 'Approachable chemistry walkthroughs with visual problem-solving strategies for stoichiometry, equilibrium, and organic chemistry.',
+    subscriberHint: 'Chemistry Problem Solving',
+    category: 'chemistry',
+  },
+  {
+    channelName: 'Chemistry Guru',
+    channelHandle: '@ChemistryGuruSG',
+    channelUrl: 'https://www.youtube.com/@ChemistryGuruSG',
+    focusArea: 'A-Level & College Chemistry Tutorials',
+    defaultWhyRelevant: 'Structured chemistry tutorials covering physical, organic, and inorganic chemistry aligned to A-Level and college syllabi.',
+    subscriberHint: 'A-Level & College Chemistry',
+    category: 'chemistry',
+  },
+  {
+    channelName: 'Najam ul Hassan (Chemistry)',
+    channelHandle: '@NajamChemistry',
+    channelUrl: 'https://www.youtube.com/@NajamChemistry',
+    focusArea: 'Organic & Inorganic Chemistry Lectures',
+    defaultWhyRelevant: 'Detailed organic and inorganic chemistry lectures with reaction mechanisms and exam-focused summaries.',
+    subscriberHint: 'Organic & Inorganic Chemistry',
+    category: 'chemistry',
+  },
+
+  // Biology & Life Sciences
+  {
+    channelName: 'Amoeba Sisters',
+    channelHandle: '@AmoebaSisters',
+    channelUrl: 'https://www.youtube.com/@AmoebaSisters',
+    focusArea: 'Biology, Genetics & Life Sciences Animations',
+    defaultWhyRelevant: 'Animated, friendly biology explainers covering cell biology, genetics, ecology, and human body systems.',
+    subscriberHint: 'Animated Biology',
+    category: 'biology',
+  },
+  {
+    channelName: 'Bozeman Science',
+    channelHandle: '@BozemanScience',
+    channelUrl: 'https://www.youtube.com/@BozemanScience',
+    focusArea: 'AP Biology, Chemistry & Physics',
+    defaultWhyRelevant: 'Comprehensive AP science tutorials with clear concept summaries aligned to standard biology curricula.',
+    subscriberHint: 'AP Science Tutorials',
+    category: 'biology',
+  },
+  {
+    channelName: 'Ninja Nerd',
+    channelHandle: '@NinjaNerdScience',
+    channelUrl: 'https://www.youtube.com/@NinjaNerdScience',
+    focusArea: 'Medical Biology, Physiology & Biochemistry',
+    defaultWhyRelevant: 'Detailed whiteboard lectures on human physiology, biochemistry, and medical biology ideal for MBBS and biomedical students.',
+    subscriberHint: 'Medical Biology & Physiology',
+    category: 'biology',
+  },
+  {
+    channelName: 'Neural Academy',
+    channelHandle: '@NeuralAcademy',
+    channelUrl: 'https://www.youtube.com/@NeuralAcademy',
+    focusArea: 'Neuroscience, Cell Biology & Genetics',
+    defaultWhyRelevant: 'Visually rich lessons on molecular biology, neuroscience, and genetics for university life-science students.',
+    subscriberHint: 'Neuroscience & Genetics',
+    category: 'biology',
+  },
+
+  // Economics & Commerce
+  {
+    channelName: 'Jacob Clifford',
+    channelHandle: '@jacobjin',
+    channelUrl: 'https://www.youtube.com/@jacobjin',
+    focusArea: 'Microeconomics & Macroeconomics Exam Prep',
+    defaultWhyRelevant: 'Energetic economics exam review covering supply-demand, market structures, fiscal and monetary policy.',
+    subscriberHint: 'Economics Exam Prep',
+    category: 'economics',
+  },
+  {
+    channelName: 'Marginal Revolution University',
+    channelHandle: '@mruniversity',
+    channelUrl: 'https://www.youtube.com/@mruniversity',
+    focusArea: 'Micro & Macro Economics Master Courses',
+    defaultWhyRelevant: 'University-grade economics courses from George Mason University professors covering trade, inflation, and game theory.',
+    subscriberHint: 'University Economics',
+    category: 'economics',
+  },
+  {
+    channelName: 'CrashCourse Economics',
+    channelHandle: '@crashcourse',
+    channelUrl: 'https://www.youtube.com/@crashcourse',
+    focusArea: 'Introductory Economics Animated Series',
+    defaultWhyRelevant: 'Polished animated series covering foundational micro and macroeconomics concepts for beginners.',
+    subscriberHint: 'Animated Economics',
+    category: 'economics',
+  },
+
+  // Business & Accountancy
+  {
+    channelName: 'Accounting Stuff',
+    channelHandle: '@AccountingStuff',
+    channelUrl: 'https://www.youtube.com/@AccountingStuff',
+    focusArea: 'Accounting Principles & Financial Statements',
+    defaultWhyRelevant: 'Clear accounting walkthroughs for journal entries, ledgers, balance sheets, and IFRS/GAAP principles.',
+    subscriberHint: 'Accounting Walkthroughs',
+    category: 'business',
+  },
+  {
+    channelName: 'Edsplore',
+    channelHandle: '@edsplore',
+    channelUrl: 'https://www.youtube.com/@edsplore',
+    focusArea: 'Business Studies & Management Concepts',
+    defaultWhyRelevant: 'Structured business studies lessons covering marketing, HR, operations, and entrepreneurship aligned to B.Com/BBA syllabi.',
+    subscriberHint: 'Business Studies',
+    category: 'business',
+  },
+  {
+    channelName: 'Corporate Finance Institute',
+    channelHandle: '@corporatefinanceinstitute',
+    channelUrl: 'https://www.youtube.com/@corporatefinanceinstitute',
+    focusArea: 'Corporate Finance, Financial Modeling & Excel',
+    defaultWhyRelevant: 'Professional finance tutorials on financial modeling, valuation, and corporate accounting for B.Com and MBA students.',
+    subscriberHint: 'Corporate Finance',
+    category: 'business',
+  },
+
+  // Humanities & Social Science
+  {
+    channelName: 'CrashCourse',
+    channelHandle: '@crashcourse',
+    channelUrl: 'https://www.youtube.com/@crashcourse',
+    focusArea: 'History, Government, Psychology & Literature',
+    defaultWhyRelevant: 'Animated overview series across world history, psychology, sociology, and literature ideal for first-pass learning.',
+    subscriberHint: 'Animated Humanities',
+    category: 'humanities',
+  },
+  {
+    channelName: 'TED-Ed',
+    channelHandle: '@TEDEd',
+    channelUrl: 'https://www.youtube.com/@TEDEd',
+    focusArea: 'Animated Lessons across Humanities & Sciences',
+    defaultWhyRelevant: 'High-production animated lessons on history, philosophy, economics, and science from expert educators.',
+    subscriberHint: 'Animated Explainers',
+    category: 'humanities',
+  },
+  {
+    channelName: 'Heimler\u2019s History',
+    channelHandle: '@heimlershistory',
+    channelUrl: 'https://www.youtube.com/@heimlershistory',
+    focusArea: 'AP World, US & European History',
+    defaultWhyRelevant: 'Focused AP history exam prep covering historical thinking skills, essay writing, and thematic timelines.',
+    subscriberHint: 'AP History Prep',
+    category: 'humanities',
+  },
+  {
+    channelName: 'Geography Now',
+    channelHandle: '@GeographyNow',
+    channelUrl: 'https://www.youtube.com/@GeographyNow',
+    focusArea: 'World Geography & Social Science',
+    defaultWhyRelevant: 'Country-by-country geography overviews covering physical, human, and political geography for social science students.',
+    subscriberHint: 'World Geography',
+    category: 'humanities',
+  },
+
+  // English & Communication
+  {
+    channelName: 'English with Lucy',
+    channelHandle: '@EnglishWithLucy',
+    channelUrl: 'https://www.youtube.com/@EnglishWithLucy',
+    focusArea: 'English Grammar, Vocabulary & Pronunciation',
+    defaultWhyRelevant: 'British English lessons on grammar, vocabulary, and pronunciation useful for academic English and communication skills.',
+    subscriberHint: 'British English Lessons',
+    category: 'english',
+  },
+  {
+    channelName: 'Learn English with Mr. Duncan',
+    channelHandle: '@duncaninengland',
+    channelUrl: 'https://www.youtube.com/@duncaninengland',
+    focusArea: 'English Basics & Conversational Skills',
+    defaultWhyRelevant: 'Friendly lessons on everyday English, grammar, and conversational skills for learners.',
+    subscriberHint: 'Conversational English',
+    category: 'english',
+  },
+  {
+    channelName: 'SparkNotes',
+    channelHandle: '@sparknotes',
+    channelUrl: 'https://www.youtube.com/@sparknotes',
+    focusArea: 'Literature Summaries & Analysis',
+    defaultWhyRelevant: 'Animated literature summaries and thematic analysis of classic novels and plays for English literature students.',
+    subscriberHint: 'Literature Summaries',
+    category: 'english',
+  },
 
   // Universal / University Degree
   {
@@ -450,6 +831,24 @@ const VERIFIED_CHANNELS: VerifiedChannelTemplate[] = [
     focusArea: 'Mastery-Based Foundational Walkthroughs',
     defaultWhyRelevant: 'Pedagogically designed bite-sized lessons that build strong conceptual fundamentals without cognitive overload.',
     subscriberHint: 'Foundational Mastery',
+    category: 'general',
+  },
+  {
+    channelName: 'Stanford',
+    channelHandle: '@Stanford',
+    channelUrl: 'https://www.youtube.com/@Stanford',
+    focusArea: 'Stanford University Lectures & Seminars',
+    defaultWhyRelevant: 'Public Stanford University lectures, guest talks, and seminar series across disciplines.',
+    subscriberHint: 'Stanford Lectures',
+    category: 'general',
+  },
+  {
+    channelName: 'YaleCourses',
+    channelHandle: '@yalecourses',
+    channelUrl: 'https://www.youtube.com/@yalecourses',
+    focusArea: 'Yale University Open Course Lectures',
+    defaultWhyRelevant: 'Full Yale undergraduate open courses in philosophy, political science, psychology, and literature.',
+    subscriberHint: 'Yale Open Courses',
     category: 'general',
   },
 ];
@@ -491,7 +890,7 @@ export function discoverYouTubeChannels(
   }
 
   // 2. Determine target category from subjectName
-  let matchedCat: 'cs' | 'math' | 'physics' | 'electronics' | 'general' = 'general';
+  let matchedCat: 'cs' | 'math' | 'physics' | 'electronics' | 'chemistry' | 'biology' | 'economics' | 'business' | 'humanities' | 'english' | 'general' = 'general';
   if (
     sLower.includes('cs') ||
     sLower.includes('programm') ||
@@ -534,6 +933,53 @@ export function discoverYouTubeChannels(
     sLower.includes('microprocessor')
   ) {
     matchedCat = 'electronics';
+  } else if (
+    sLower.includes('chem')
+  ) {
+    matchedCat = 'chemistry';
+  } else if (
+    sLower.includes('bio') ||
+    sLower.includes('genetic') ||
+    sLower.includes('physio') ||
+    sLower.includes('anatom') ||
+    sLower.includes('zoolog') ||
+    sLower.includes('botan')
+  ) {
+    matchedCat = 'biology';
+  } else if (
+    sLower.includes('econ') ||
+    sLower.includes('macro') ||
+    sLower.includes('microecon') ||
+    sLower.includes('trade')
+  ) {
+    matchedCat = 'economics';
+  } else if (
+    sLower.includes('account') ||
+    sLower.includes('business') ||
+    sLower.includes('commerc') ||
+    sLower.includes('manage') ||
+    sLower.includes('bba') ||
+    sLower.includes('b.com')
+  ) {
+    matchedCat = 'business';
+  } else if (
+    sLower.includes('history') ||
+    sLower.includes('geograph') ||
+    sLower.includes('civic') ||
+    sLower.includes('politic') ||
+    sLower.includes('sociolog') ||
+    sLower.includes('psycholog') ||
+    sLower.includes('social science') ||
+    sLower.includes('humanit')
+  ) {
+    matchedCat = 'humanities';
+  } else if (
+    sLower.includes('english') ||
+    sLower.includes('literature') ||
+    sLower.includes('grammar') ||
+    sLower.includes('communication')
+  ) {
+    matchedCat = 'english';
   }
 
   // Filter channels: prioritized category first, plus top general university channels
@@ -544,7 +990,7 @@ export function discoverYouTubeChannels(
   const candidateChannels = [...prioritized, ...generalChannels];
 
   // Build channel discoveries
-  candidateChannels.slice(0, 6).forEach((c, idx) => {
+  candidateChannels.slice(0, 12).forEach((c, idx) => {
     // Avoid duplicate channel names
     if (results.some((r) => r.channelName.toLowerCase() === c.channelName.toLowerCase())) {
       return;
